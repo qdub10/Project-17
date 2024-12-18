@@ -24,20 +24,26 @@ const reactionSchema = new Schema({
 const thoughtSchema = new Schema({
   thoughtText: {
     type: String,
-    required: true,
+    required: [true, 'Path `thoughtText` is required.'],
     minlength: 1,
     maxlength: 280,
   },
   username: {
     type: String,
-    required: true,
+    required: [true, 'Path `username` is required.'],
   },
   createdAt: {
     type: Date,
     default: Date.now,
     get: (timestamp) => new Date(timestamp).toLocaleString(),
   },
-  reactions: [reactionSchema],
+  reactions: [
+    {
+      reactionBody: String,
+      username: String,
+      createdAt: Date,
+    },
+  ],
 });
 
 const Thought = model('Thought', thoughtSchema);
