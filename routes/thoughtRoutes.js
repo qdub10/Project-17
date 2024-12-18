@@ -40,8 +40,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-
-
+// GET all reactions for a thought
+router.get('/:thoughtId/reactions', async (req, res) => {
+  try {
+    const thought = await Thought.findById(req.params.thoughtId);
+    res.success(thought.reactions);
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    if (err.name === 'CastError') {
+      res.error('No thought found with this ID', 404);
+    } else {
+      res.error('Failed to fetch reactions');
+    }
+  }
+});
 // PUT to update a thought by ID
 router.put('/:id', async (req, res) => {
   try {
@@ -81,15 +93,17 @@ router.post('/:thoughtId/reactions', async (req, res) => {
   try {
     const thought = await Thought.findByIdAndUpdate(
       req.params.thoughtId,
-      { $addToSet: { reactions: req.body } },
-      { new: true, runValidators: true }
+      { $addToSet: { reactions: req.body } }, // Add the reaction
+      { new: true, runValidators: true } // Return the updated document
     );
 
     if (!thought) {
       return res.error('No thought found with this ID', 404);
     }
+
     res.success(thought);
   } catch (err) {
+    console.error(err); // Log the error
     res.error('Failed to add reaction');
   }
 });
@@ -99,16 +113,18 @@ router.delete('/:thoughtId/reactions/:reactionId', async (req, res) => {
   try {
     const thought = await Thought.findByIdAndUpdate(
       req.params.thoughtId,
-      { $pull: { reactions: { reactionId: req.params.reactionId } } },
-      { new: true }
+      { $pull: { reactions: { reactionId: req.params.reactionId } } }, // Remove the reaction by ID
+      { new: true } // Return the updated document
     );
 
     if (!thought) {
       return res.error('No thought found with this ID', 404);
     }
-    res.success(thought);
+
+    res.success(thought); // Return the updated thought
   } catch (err) {
-    res.error('Failed to remove reaction');
+    console.error('Error deleting reaction:', err); // Log the error for debugging
+    res.error('Failed to delete reaction');
   }
 });
 
