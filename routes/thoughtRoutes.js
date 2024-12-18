@@ -27,12 +27,20 @@ router.get('/:id', async (req, res) => {
 // POST to create a new thought
 router.post('/', async (req, res) => {
   try {
-    const newThought = await Thought.create(req.body);
+    const newThought = await Thought.create(req.body); // Attempt to create the Thought
     res.success(newThought);
   } catch (err) {
-    res.error('Failed to create thought', 400);
+    console.error(err); // Log the error for debugging
+    if (err.name === 'ValidationError') {
+      // Capture validation errors and provide a helpful response
+      res.error(`Validation Error: ${Object.values(err.errors).map(e => e.message).join(', ')}`, 400);
+    } else {
+      res.error('Failed to create thought', 500); // Generic error for other issues
+    }
   }
 });
+
+
 
 // PUT to update a thought by ID
 router.put('/:id', async (req, res) => {
