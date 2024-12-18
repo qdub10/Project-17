@@ -35,6 +35,41 @@ router.post('/', async (req, res) => {
   }
 });
 
+// PUT to update a user by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true } // Return updated document and run validations
+    );
+
+    if (!updatedUser) {
+      return res.error('No user found with this ID', 404);
+    }
+
+    res.success(updatedUser); // Respond with the updated user
+  } catch (err) {
+    console.error(err); // Log error
+    res.error('Failed to update user');
+  }
+});
+
+// DELETE to remove a user by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+    if (!deletedUser) {
+      return res.error('No user found with this ID', 404);
+    }
+
+    res.success({ message: 'User deleted successfully!', deletedUser });
+  } catch (err) {
+    res.error('Failed to delete user');
+  }
+});
+
 // POST to add a friend to a user's friend list
 router.post('/:userId/friends/:friendId', async (req, res) => {
   try {
