@@ -28,10 +28,16 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const newUser = await User.create(req.body); // Create the user
-    res.success(newUser); // Use success response
+    res.success(newUser); // Return the newly created user
   } catch (err) {
-    console.error(err); // Log errors
-    res.error('Failed to create user', 400); // Return error response
+    console.error('Error creating user:', err); // Log the error for debugging
+    if (err.name === 'ValidationError') {
+      res.error('Validation Error: ' + err.message, 400); // Handle validation errors
+    } else if (err.code === 11000) {
+      res.error('Duplicate Error: This username or email already exists.', 400); // Handle duplicate errors
+    } else {
+      res.error('Failed to create user');
+    }
   }
 });
 
