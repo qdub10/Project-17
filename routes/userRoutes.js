@@ -24,6 +24,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// POST to create a new user
+router.post('/', async (req, res) => {
+  try {
+    const newUser = await User.create(req.body); // Create the user
+    res.success(newUser); // Use success response
+  } catch (err) {
+    console.error(err); // Log errors
+    res.error('Failed to create user', 400); // Return error response
+  }
+});
+
 // POST to add a friend to a user's friend list
 router.post('/:userId/friends/:friendId', async (req, res) => {
   try {
